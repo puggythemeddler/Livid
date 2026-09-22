@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<style>
+  :root {
+    --emerald: #0b5d43;
+    --emerald-deep: #073f2d;
+    --gold: #c9a24b;
+    --gold-light: #e6cd8b;
+    --cream: #fbf6ea;
+    --rose: #d97f74;
+    --ink: #1c2b26;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --cream: #10201a;
+      --ink: #f2ead9;
+      --emerald: #1a8f68;
+      --emerald-deep: #0d3d2c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --cream: #10201a;
+    --ink: #f2ead9;
+    --emerald: #1a8f68;
+    --emerald-deep: #0d3d2c;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); scroll-behavior: smooth; }
+  html, body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  body {
+    min-height: 100%;
+    position: relative;
+  }
+
+  /* ---------- decorative islamic-style geometric border pattern ---------- */
+  .pattern-band {
+    width: 100%;
+    height: 14px;
+    background-image: repeating-linear-gradient(135deg, var(--gold) 0 6px, transparent 6px 12px),
+                       repeating-linear-gradient(45deg, var(--gold) 0 6px, transparent 6px 12px);
+    background-size: 24px 14px;
+    background-position: 0 0, 0 0;
+    opacity: 0.55;
+  }
+
+  header.hero {
+    position: relative;
+    padding: calc(48px + env(safe-area-inset-top, 0px)) 24px 64px;
+    background: radial-gradient(circle at 50% 0%, var(--emerald) 0%, var(--emerald-deep) 70%);
+    color: var(--cream);
+    text-align: center;
+    overflow: hidden;
+  }
+  .star-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .star {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: var(--gold-light);
+    border-radius: 50%;
+    opacity: 0.7;
+  }
+
+  .eyebrow {
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    color: var(--gold-light);
+    margin: 0 0 6px;
+    font-weight: 300;
+  }
+  h1.headline {
+    font-family: 'Amiri', serif;
+    font-size: clamp(32px, 9vw, 52px);
+    line-height: 1.15;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  .headline .name {
+    color: var(--gold-light);
+  }
+  .sub {
+    font-size: 16px;
+    max-width: 320px;
+    margin: 0 auto;
+    opacity: 0.85;
+    font-weight: 300;
+  }
+
+  /* mascot */
+  .mascot-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 28px auto 6px;
+  }
+  svg#bison { width: 100%; height: 100%; overflow: visible; }
+  .tap-hint {
+    font-size: 12px;
+    color: var(--gold-light);
+    opacity: 0.75;
+    margin-top: -4px;
+  }
+
+  main {
+    padding: 40px 20px 20px;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: color-mix(in srgb, var(--gold) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+    border-radius: 18px;
+    padding: 28px 22px;
+    text-align: center;
+    position: relative;
+  }
+  .card h2 {
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin: 0 0 14px;
+    color: var(--emerald);
+  }
+  html[data-forced-dark] .card h2, :root:not([data-theme="light"]) .card h2 {
+    color: var(--gold-light);
+  }
+  #flirt-line {
+    font-size: 18px;
+    line-height: 1.5;
+    min-height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+  button.next-btn {
+    margin-top: 18px;
+    border: none;
+    background: var(--emerald);
+    color: var(--cream);
+    padding: 12px 26px;
+    border-radius: 999px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+  }
+  button.next-btn:active { transform: scale(0.96); }
+  button.next-btn:focus-visible, .mascot-wrap:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+  .joke-toggle {
+    margin-top: 34px;
+    text-align: center;
+  }
+  .joke-toggle a {
+    color: var(--emerald);
+    font-size: 14px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  :root:not([data-theme="light"]) .joke-toggle a { color: var(--gold-light); }
+
+  #joke-line {
+    margin-top: 14px;
+    font-size: 15px;
+    text-align: center;
+    opacity: 0;
+    min-height: 44px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px calc(48px + env(safe-area-inset-bottom, 0px));
+    font-family: 'Amiri', serif;
+    font-size: 15px;
+    opacity: 0.8;
+  }
+
+  /* floating hearts */
+  .heart {
+    position: fixed;
+    bottom: -20px;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 5;
+    color: var(--rose);
+    opacity: 0.9;
+  }
+
+  /* ---------- one-month anniversary ---------- */
+  .anniv-card { margin-top: 42px; }
+  .anniv-locked .anniv-content { display: none; }
+  .anniv-open .anniv-lock { display: none; }
+  .anniv-content { min-height: 0; }
+  .anniv-content[hidden] { display: none; }
+  .anniv-lock {
+    background: color-mix(in srgb, var(--emerald) 10%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--gold) 55%, transparent);
+    border-radius: 18px;
+    padding: 26px 20px;
+    text-align: center;
+  }
+  .anniv-lock .lock-emoji { font-size: 34px; }
+  .anniv-lock p { margin: 10px 0 16px; font-size: 14px; opacity: 0.85; line-height: 1.6; }
+  button.soft-btn {
+    border: 1px solid color-mix(in srgb, var(--gold) 60%, transparent);
+    background: transparent;
+    color: var(--gold);
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  :root:not([data-theme="light"]) button.soft-btn { color: var(--gold-light); }
+  button.soft-btn:active { transform: scale(0.96); }
+  .anniv-content {
+    background: linear-gradient(160deg, color-mix(in srgb, var(--emerald) 16%, transparent), color-mix(in srgb, var(--gold) 12%, transparent));
+    border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+    border-radius: 18px;
+    padding: 30px 22px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+  }
+  .anniv-content h2 {
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    font-size: 26px;
+    margin: 0 0 12px;
+    color: var(--emerald);
+  }
+  :root:not([data-theme="light"]) .anniv-content h2 { color: var(--gold-light); }
+  .anniv-msg { font-size: 16px; line-height: 1.75; opacity: 0.92; }
+  .anniv-msg .sign {
+    display: block;
+    margin-top: 16px;
+    font-family: 'Amiri', serif;
+    font-size: 17px;
+    color: var(--gold);
+  }
+
+  /* ---------- one small request ---------- */
+  .req-card { margin-top: 34px; }
+  .req-text { font-size: 16px; line-height: 1.7; margin-bottom: 4px; }
+  .req-yn {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  button.yes-btn {
+    border: none;
+    background: linear-gradient(135deg, var(--rose), var(--gold));
+    color: var(--cream);
+    padding: 14px 36px;
+    border-radius: 999px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--rose) 45%, transparent);
+  }
+  button.no-btn {
+    border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+    background: transparent;
+    color: var(--ink);
+    padding: 10px 24px;
+    border-radius: 999px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .req-answer {
+    margin-top: 16px;
+    font-family: 'Amiri', serif;
+    font-size: 18px;
+    opacity: 0;
+    min-height: 24px;
+  }
+
+  /* ---------- together counter ---------- */
+  .together-card { margin-top: 34px; }
+  .together-num {
+    font-family: 'Amiri', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1.1;
+  }
+  .together-sub { font-size: 13px; opacity: 0.75; margin-top: 4px; }
+
+  /* ---------- poem ---------- */
+  .poem-card { margin-top: 34px; }
+  .poem-box {
+    min-height: 170px;
+    font-family: 'Amiri', serif;
+    font-size: 18px;
+    line-height: 1.9;
+    text-align: left;
+    white-space: pre-line;
+    opacity: 0.95;
+  }
+
+  /* ---------- music ---------- */
+  .music-float {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+  }
+  button.music-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-deep));
+    color: var(--gold-light);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  button.music-btn:active { transform: scale(0.96); }
+  .music-panel {
+    position: fixed;
+    right: 16px;
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+    width: min(320px, calc(100vw - 24px));
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+  }
+  .music-panel.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .music-panel iframe {
+    display: block;
+    width: 100%;
+    height: 152px;
+    border: 0;
+    background: #181818;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="star-field" id="starField"></div>
+  <p class="eyebrow" id="greeting">a little something for Shabnam</p>
+  <h1 class="headline">Shabnam, you're <span class="name">absolutely breathtaking</span></h1>
+  <p class="sub">and also stuck with me, apparently. lucky you.</p>
+
+  <div class="mascot-wrap" id="mascotWrap" tabindex="0" role="button" aria-label="Tap the sky bison for a surprise">
+    <svg id="bison" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="150" rx="10" ry="4" fill="#000" opacity="0.12"/>
+      <g id="bisonBody">
+        <path d="M40 130 Q30 90 65 75 Q75 55 105 55 Q140 50 160 75 Q190 80 185 115 Q195 140 165 150 Q150 165 115 162 Q80 168 55 150 Q35 148 40 130 Z" fill="#fbf6ea" stroke="#c9a24b" stroke-width="2"/>
+        <path d="M55 90 Q30 85 20 105 Q30 118 55 108 Z" fill="#fbf6ea" stroke="#c9a24b" stroke-width="2" id="earL"/>
+        <ellipse cx="150" cy="95" rx="26" ry="22" fill="#fbf6ea" stroke="#c9a24b" stroke-width="2"/>
+        <circle cx="158" cy="92" r="4.5" fill="#1c2b26"/>
+        <circle cx="159.5" cy="90.5" r="1.3" fill="#fff"/>
+        <path d="M168 100 q6 4 2 8" stroke="#1c2b26" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <g fill="none" stroke="#0b5d43" stroke-width="3" stroke-linecap="round" opacity="0.55">
+          <path d="M75 70 l10 10 l-10 10 l-10 -10 Z" fill="#0b5d43" stroke="none"/>
+          <circle cx="100" cy="100" r="5" fill="#0b5d43" stroke="none"/>
+          <circle cx="118" cy="88" r="4" fill="#0b5d43" stroke="none"/>
+          <circle cx="90" cy="120" r="4" fill="#0b5d43" stroke="none"/>
+        </g>
+        <g id="wingL">
+          <path d="M55 105 Q20 95 15 125 Q40 135 60 118 Z" fill="#e6cd8b" stroke="#c9a24b" stroke-width="2"/>
+        </g>
+        <g id="wingR">
+          <path d="M160 130 Q195 130 195 158 Q170 165 155 145 Z" fill="#e6cd8b" stroke="#c9a24b" stroke-width="2"/>
+        </g>
+        <g id="tail">
+          <path d="M45 135 Q20 140 25 160 Q35 150 48 145 Z" fill="#e6cd8b" stroke="#c9a24b" stroke-width="2"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <p class="tap-hint">tap me ✨</p>
+</header>
+
+<div class="pattern-band"></div>
+
+<main>
+  <div class="card">
+    <h2>reasons, in no particular order</h2>
+    <div id="flirt-line">Loading something sweet...</div>
+    <button class="next-btn" id="nextBtn">one more →</button>
+  </div>
+
+  <div class="joke-toggle">
+    <a id="jokeToggle">okay but do you have a joke too?</a>
+    <div id="joke-line"></div>
+  </div>
+
+  <div class="card poem-card">
+    <h2>one month with you ❤️</h2>
+    <div class="poem-box" id="poemBox"></div>
+    <button class="soft-btn" id="poemBtn" style="margin-top:16px">again, slowly ↺</button>
+  </div>
+
+  <div class="card together-card">
+    <h2>us, so far</h2>
+    <div class="together-num" id="togetherDays">0</div>
+    <div class="together-sub" id="togetherClock">waking up…</div>
+  </div>
+
+  <div class="card anniv-card" id="annivWrap">
+    <h2>a whole month 🌙</h2>
+    <div class="anniv-lock" id="annivLock">
+      <div class="lock-emoji">🔒</div>
+      <p>a little something is waiting here for you…<br>it unlocks tomorrow.</p>
+      <button class="soft-btn" id="peekBtn">I can't wait 🥹 open it now</button>
+    </div>
+    <div class="anniv-content" id="annivOpen" hidden>
+      <h2>one month of you 🥂</h2>
+      <div class="anniv-msg">
+        One whole month, Shabnam — and it already feels like I've loved your laugh my whole life.
+        Thank you for every one of these days, for your smile, for you.
+        Here's to the next month, and then the one after that.
+        <span class="sign">happily yours, Josphat 🌙</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card req-card" id="reqCard">
+    <h2>one small request</h2>
+    <!-- ✏️ EDIT YOUR REQUEST HERE -->
+    <div class="req-text">Can I borrow your hand for a slow dance, your attention for one silly idea, and your smile for the rest of the day?</div>
+    <div class="req-yn">
+      <button class="yes-btn" id="yesBtn">yes 💚</button>
+      <button class="no-btn" id="noBtn">no</button>
+    </div>
+    <div class="req-answer" id="reqAnswer"></div>
+  </div>
+</main>
+
+<footer>
+  made with a very soft heart, just for you, Shabnam 🌙<br><span style="opacity:0.7">— Josphat</span>
+</footer>
+
+<div class="music-panel" id="musicPanel">
+  <iframe src="https://open.spotify.com/embed/track/4ud5CYIXZekCQSjFCuByXt" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+<div class="music-float">
+  <button class="music-btn" id="musicBtn" aria-label="toggle music">🎵 our song</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var flirts = [
+    "You walked in and every geometric pattern in the room suddenly felt a bit dull in comparison.",
+    "I was going to write something clever, but honestly you just make my brain stop working. Compliment intended.",
+    "If beauty were a call to prayer, you'd have the whole neighborhood showing up early.",
+    "You're the reason my favorite color changed to whatever color you wore last.",
+    "Somewhere between your smile and your laugh, I lost track of what I was going to say. Worth it.",
+    "You have this habit of being effortlessly stunning at moments you least expect. Please stop, I have things to do.",
+    "I asked the sky bison for wisdom. It just drew a heart. Honestly, fair.",
+    "You're proof that some things really are more beautiful than a sunset over the sea.",
+    "My favorite part of any day is still the part where I get to think about you.",
+    "You didn't just steal my attention, you're renting it long-term, with no plans to move out.",
+    "Every time you laugh at something dumb I said, I feel like I won a small, private award.",
+    "If patience is a virtue, you're the reason I'm slowly becoming a saint. Barely."
+  ];
+
+  var jokes = [
+    "Are you a crescent moon? Because you're the highlight of my night sky.",
+    "I'm not a mathematician, but I'm pretty sure you're the missing piece I've been carrying a calculator around for.",
+    "You must be tired, because you've been running through my mind since we last talked. Also, I need to update that joke.",
+    "I tried to think of a flaw in you. Still working on it. Might take years.",
+    "They say the bison never forgets. Same, but only about how you looked today.",
+    "Is your name Wi-Fi? Because I'm clearly still connected, and I don't want to disconnect.",
+    "I'm no calligrapher, but if I wrote your name in gold ink, it still wouldn't be as pretty as you.",
+    "You know what's rare? A joke this bad landing this well because you're the one reading it."
+  ];
+
+  var flirtEl = document.getElementById('flirt-line');
+  var jokeEl = document.getElementById('joke-line');
+  var jokeToggle = document.getElementById('jokeToggle');
+  var nextBtn = document.getElementById('nextBtn');
+  var mascotWrap = document.getElementById('mascotWrap');
+
+  var flirtIdx = -1;
+  var jokeShown = false;
+  var jokeIdx = -1;
+
+  function pickNext(arr, lastIdx) {
+    if (arr.length === 1) return 0;
+    var i;
+    do { i = Math.floor(Math.random() * arr.length); } while (i === lastIdx);
+    return i;
+  }
+
+  function showFlirt() {
+    flirtIdx = pickNext(flirts, flirtIdx);
+    if (window.anime) {
+      anime({
+        targets: flirtEl,
+        opacity: [1, 0],
+        translateY: [0, -8],
+        duration: 180,
+        easing: 'easeInQuad',
+        complete: function () {
+          flirtEl.textContent = flirts[flirtIdx];
+          anime({
+            targets: flirtEl,
+            opacity: [0, 1],
+            translateY: [8, 0],
+            duration: 320,
+            easing: 'easeOutQuad'
+          });
+        }
+      });
+    } else {
+      flirtEl.textContent = flirts[flirtIdx];
+    }
+  }
+
+  function showJoke() {
+    jokeIdx = pickNext(jokes, jokeIdx);
+    jokeEl.textContent = jokes[jokeIdx];
+    if (window.anime) {
+      anime({ targets: jokeEl, opacity: [0, 1], translateY: [10, 0], duration: 400, easing: 'easeOutQuad' });
+    } else {
+      jokeEl.style.opacity = 1;
+    }
+  }
+
+  nextBtn.addEventListener('click', showFlirt);
+  jokeToggle.addEventListener('click', function () {
+    jokeShown = !jokeShown;
+    if (jokeShown) {
+      jokeToggle.textContent = 'okay, enough jokes 🙈';
+      showJoke();
+    } else {
+      jokeToggle.textContent = 'okay but do you have a joke too?';
+      if (window.anime) {
+        anime({ targets: jokeEl, opacity: [1, 0], duration: 200, easing: 'easeInQuad' });
+      } else {
+        jokeEl.style.opacity = 0;
+      }
+    }
+  });
+
+  showFlirt();
+
+  // ---- stars in hero ----
+  var starField = document.getElementById('starField');
+  var starCount = 26;
+  for (var s = 0; s < starCount; s++) {
+    var star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 70 + '%';
+    star.style.transform = 'scale(' + (0.6 + Math.random() * 1.4).toFixed(2) + ')';
+    starField.appendChild(star);
+  }
+  if (window.anime) {
+    anime({
+      targets: '.star',
+      opacity: [0.15, 0.9],
+      duration: function () { return 1200 + Math.random() * 1600; },
+      delay: anime.stagger(60),
+      direction: 'alternate',
+      loop: true,
+      easing: 'easeInOutSine'
+    });
+  }
+
+  // ---- hero load sequence ----
+  if (window.anime) {
+    anime.timeline({ easing: 'easeOutExpo' })
+      .add({ targets: '.eyebrow', opacity: [0, 1], translateY: [-6, 0], duration: 500 })
+      .add({ targets: '.headline', opacity: [0, 1], translateY: [16, 0], duration: 650 }, '-=300')
+      .add({ targets: '.sub', opacity: [0, 0.85], translateY: [10, 0], duration: 500 }, '-=350')
+      .add({ targets: '#mascotWrap', opacity: [0, 1], translateX: [-40, 0], rotate: [-6, 0], duration: 700 }, '-=250')
+      .add({ targets: '.tap-hint', opacity: [0, 0.75], duration: 400 }, '-=200')
+      .add({ targets: '.card', opacity: [0, 1], translateY: [20, 0], duration: 600 }, '-=200');
+  }
+
+  // ---- mascot idle bob + wing flap ----
+  if (window.anime) {
+    anime({
+      targets: '#bisonBody',
+      translateY: [-6, 0],
+      duration: 2200,
+      direction: 'alternate',
+      loop: true,
+      easing: 'easeInOutSine'
+    });
+    anime({
+      targets: ['#wingL', '#wingR'],
+      rotate: function (el) { return el.id === 'wingL' ? [0, -8] : [0, 8]; },
+      duration: 900,
+      direction: 'alternate',
+      loop: true,
+      easing: 'easeInOutSine'
+    });
+    anime({
+      targets: '#tail',
+      rotate: [0, 6],
+      duration: 1400,
+      direction: 'alternate',
+      loop: true,
+      easing: 'easeInOutSine'
+    });
+  }
+
+  // ---- tap mascot: burst hearts + jump ----
+  function burstHearts(x, y, count) {
+    var symbols = ['💚', '🤍', '💛', '✨'];
+    for (var i = 0; i < count; i++) {
+      var h = document.createElement('div');
+      h.className = 'heart';
+      h.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      h.style.left = (x + (Math.random() * 60 - 30)) + 'px';
+      h.style.top = y + 'px';
+      h.style.fontSize = (14 + Math.random() * 14) + 'px';
+      document.body.appendChild(h);
+      (function (el) {
+        if (window.anime) {
+          anime({
+            targets: el,
+            translateY: -(280 + Math.random() * 200),
+            translateX: (Math.random() * 120 - 60),
+            opacity: [0.9, 0],
+            rotate: (Math.random() * 60 - 30),
+            duration: 1800 + Math.random() * 800,
+            easing: 'easeOutQuad',
+            complete: function () { el.remove(); }
+          });
+        } else {
+          setTimeout(function () { el.remove(); }, 2000);
+        }
+      })(h);
+    }
+  }
+
+  function tapMascot() {
+    var rect = mascotWrap.getBoundingClientRect();
+    burstHearts(rect.left + rect.width / 2, rect.top, 8);
+    if (window.anime) {
+      anime({
+        targets: '#bisonBody',
+        translateY: [0, -22, 0],
+        duration: 550,
+        easing: 'easeOutQuad'
+      });
+    }
+    showFlirt();
+  }
+
+  mascotWrap.addEventListener('click', tapMascot);
+  mascotWrap.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapMascot(); }
+  });
+
+  // ---- gentle ambient hearts rising from the bottom of the page ----
+  function ambientHeart() {
+    var h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = Math.random() > 0.5 ? '💚' : '🤍';
+    h.style.left = (Math.random() * 100) + 'vw';
+    h.style.fontSize = (12 + Math.random() * 10) + 'px';
+    h.style.opacity = 0.5;
+    document.body.appendChild(h);
+    if (window.anime) {
+      anime({
+        targets: h,
+        translateY: -(window.innerHeight + 60),
+        translateX: (Math.random() * 40 - 20),
+        opacity: [0.55, 0],
+        duration: 6000 + Math.random() * 3000,
+        easing: 'linear',
+        complete: function () { h.remove(); }
+      });
+    } else {
+      setTimeout(function () { h.remove(); }, 8000);
+    }
+  }
+
+  var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReduced) {
+    setInterval(ambientHeart, 1400);
+  }
+
+  // ---------- one-month anniversary ----------
+  var annivWrap = document.getElementById('annivWrap');
+  var annivOpen = document.getElementById('annivOpen');
+  var peekBtn = document.getElementById('peekBtn');
+
+  function openAnniv() {
+    if (annivWrap.classList.contains('anniv-open')) return;
+    annivWrap.classList.remove('anniv-locked');
+    annivWrap.classList.add('anniv-open');
+    annivOpen.hidden = false;
+    var r = annivWrap.getBoundingClientRect();
+    if (window.anime) {
+      anime({
+        targets: annivOpen,
+        opacity: [0, 1],
+        translateY: [18, 0],
+        scale: [0.95, 1],
+        duration: 650,
+        easing: 'easeOutQuart'
+      });
+    } else {
+      annivOpen.style.opacity = 1;
+    }
+    var sparks = ['💚', '🤍', '💛', '🎉', '🥂', '✨', '💖'];
+    for (var sp = 0; sp < 20; sp++) {
+      var spark = document.createElement('div');
+      spark.className = 'heart';
+      spark.textContent = sparks[sp % sparks.length];
+      spark.style.left = (r.left + Math.random() * r.width) + 'px';
+      spark.style.top = r.top + 'px';
+      spark.style.fontSize = (12 + Math.random() * 14) + 'px';
+      document.body.appendChild(spark);
+      (function (el) {
+        if (window.anime) {
+          anime({
+            targets: el,
+            translateY: -(140 + Math.random() * 240),
+            translateX: (Math.random() * 180 - 90),
+            rotate: (Math.random() * 80 - 40),
+            opacity: [1, 0],
+            duration: 1500 + Math.random() * 1000,
+            easing: 'easeOutQuad',
+            complete: function () { el.remove(); }
+          });
+        } else {
+          setTimeout(function () { el.remove(); }, 2200);
+        }
+      })(spark);
+    }
+    burstHearts(r.left + r.width / 2, r.top + r.height / 2, 8);
+  }
+
+  var annivDate = new Date(2026, 8, 23); // 9/23/2026, local midnight
+  (function autoUnlock() {
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (today >= annivDate) {
+      peekBtn.textContent = 'open it 💌';
+      openAnniv();
+    }
+  })();
+  peekBtn.addEventListener('click', openAnniv);
+
+  // ---------- one small request ----------
+  var yesBtn = document.getElementById('yesBtn');
+  var noBtn = document.getElementById('noBtn');
+  var reqAnswer = document.getElementById('reqAnswer');
+  var reqCard = document.getElementById('reqCard');
+  var noHits = 0;
+
+  function dodgeNo() {
+    noHits++;
+    var x = (Math.random() * 44 - 22) * (0.5 + noHits * 0.35);
+    var y = (Math.random() * 44 - 22) * (0.5 + noHits * 0.35);
+    var scale = Math.max(0.45, 1 - 0.09 * noHits);
+    if (window.anime) {
+      anime({ targets: noBtn, translateX: [0, x], translateY: [0, y], scale: scale, duration: 320, easing: 'easeOutQuad' });
+      anime({ targets: yesBtn, scale: 1 + 0.06 * noHits, duration: 320, easing: 'easeOutQuad' });
+    } else {
+      noBtn.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')';
+      yesBtn.style.transform = 'scale(' + (1 + 0.06 * noHits) + ')';
+    }
+  }
+
+  noBtn.addEventListener('click', dodgeNo);
+  noBtn.addEventListener('mouseenter', dodgeNo);
+  yesBtn.addEventListener('click', function () {
+    reqAnswer.textContent = "Yay 🥹 that's all I ever wanted, Shabnam. I'm yours.";
+    if (window.anime) {
+      anime({ targets: reqAnswer, opacity: [0, 1], translateY: [8, 0], duration: 400, easing: 'easeOutQuad' });
+      anime({ targets: yesBtn, scale: 1.25, duration: 400, easing: 'easeOutBack' });
+      anime({ targets: noBtn, opacity: [1, 0], duration: 250, easing: 'easeInQuad' });
+    } else {
+      reqAnswer.style.opacity = 1;
+      noBtn.style.opacity = 0;
+    }
+    noBtn.style.pointerEvents = 'none';
+    yesBtn.textContent = 'she said yes 💚';
+    var rc = reqCard.getBoundingClientRect();
+    burstHearts(rc.left + rc.width / 2, rc.top + rc.height / 2, 12);
+  });
+
+  // ---------- time-of-day greeting ----------
+  var greetingEl = document.getElementById('greeting');
+  function timeGreeting() {
+    var h = new Date().getHours();
+    var g;
+    if (h >= 5 && h < 12) g = 'good morning, Shabnam ☀️';
+    else if (h >= 12 && h < 17) g = 'good afternoon, my love';
+    else if (h >= 17 && h < 22) g = 'good evening, absolutely breathtaking';
+    else g = 'good night, my moon 🌙';
+    greetingEl.textContent = g;
+    return g;
+  }
+  timeGreeting();
+  setInterval(timeGreeting, 60000);
+
+  // ---------- poem, typed slowly ----------
+  var poemLines = [
+    "One month may seem like a little time,",
+    "Yet somehow, with you, it feels so divine.",
+    "A month of laughter, affection, and you,",
+    "A beautiful chapter that feels fresh and new.",
+    "",
+    "Today, as we celebrate our very first month,",
+    "I want to appreciate you for all that you've done.",
+    "For your beauty that catches my eyes every day,",
+    "And your loving, sweet, adorable way.",
+    "",
+    "I love those beautiful brown eyes of yours,",
+    "The kind I could get lost in for hours and hours.",
+    "And that sweet voice I could listen to all night,",
+    "Especially when you wake up, sleepy and light.",
+    "",
+    "I love your soft hands and the way that you blush,",
+    "When you hide your beautiful face in that shy little rush.",
+    "And those sweet lips that I love when we kiss,",
+    "Moments with you that I never want to miss.",
+    "",
+    "And yes, I have to mention that beautiful body too,",
+    "Because somehow, everything about you is just you.",
+    "Beautiful from your smile to the things I can't explain,",
+    "A woman I'm grateful to have in my life again and again.",
+    "",
+    "This first month has been beautiful in every way,",
+    "And I hope there are many more ahead of us to stay.",
+    "More months, more memories, more laughter and years,",
+    "More moments together through smiles and through tears.",
+    "",
+    "If God allows us, I hope this is only the start,",
+    "Of a beautiful journey written heart to heart.",
+    "Because after this first month, one thing feels true—",
+    "Life has been a little more beautiful because of you.",
+    "",
+    "Happy one-month anniversary, Shabnam. ❤️",
+    "",
+    "Here's to our first month,",
+    "and hopefully to many more months and years together.",
+    "I appreciate you, I cherish you, and I'm grateful for you."
+  ];
+  var poem = poemLines.join('\n');
+  var poemBox = document.getElementById('poemBox');
+  var poemBtn = document.getElementById('poemBtn');
+  var poemTimer = null;
+  function typePoem() {
+    if (poemTimer) { clearInterval(poemTimer); poemTimer = null; }
+    poemBox.textContent = '';
+    var i = 0;
+    poemTimer = setInterval(function () {
+      if (i <= poem.length) {
+        poemBox.textContent = poem.slice(0, i);
+        i++;
+      } else {
+        clearInterval(poemTimer);
+        poemTimer = null;
+      }
+    }, 14);
+  }
+  typePoem();
+  poemBtn.addEventListener('click', typePoem);
+
+  // ---------- together counter ----------
+  // ✏️ EDIT START DATE IF IT DIFFERS (year, monthIndex, day) — monthIndex is 0-based (Aug = 7)
+  var togetherStart = new Date(2026, 7, 23);
+  var daysEl = document.getElementById('togetherDays');
+  var clockEl = document.getElementById('togetherClock');
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function tickTogether() {
+    var diff = Math.max(0, new Date() - togetherStart);
+    var days = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    daysEl.textContent = days;
+    clockEl.textContent = 'days · ' + pad(h) + ':' + pad(m) + ':' + pad(s) + ' · and counting';
+  }
+  tickTogether();
+  setInterval(tickTogether, 1000);
+
+  // ---------- music toggle ----------
+  var musicBtn = document.getElementById('musicBtn');
+  var musicPanel = document.getElementById('musicPanel');
+  musicBtn.addEventListener('click', function () {
+    var open = musicPanel.classList.toggle('open');
+    musicBtn.textContent = open ? '🎵 listening' : '🎵 our song';
+  });
+
+})();
+</script>
+</body>
+</html>
