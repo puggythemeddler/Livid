@@ -374,6 +374,114 @@
     background: #181818;
   }
 
+  /* ---------- anniversary tease + glow ---------- */
+  .anniv-tease {
+    margin-top: 12px;
+    min-height: 20px;
+    font-family: 'Amiri', serif;
+    font-size: 16px;
+    color: var(--gold);
+    opacity: 0;
+  }
+  :root:not([data-theme="light"]) .anniv-tease { color: var(--gold-light); }
+  .anniv-tease.show { opacity: 1; transition: opacity 0.3s ease; }
+  .lock-shake { animation: lockShake 0.5s ease; }
+  @keyframes lockShake {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-9deg); }
+    40% { transform: rotate(9deg); }
+    60% { transform: rotate(-6deg); }
+    80% { transform: rotate(6deg); }
+  }
+  .anniv-content.revealed {
+    box-shadow: 0 0 44px color-mix(in srgb, var(--gold) 38%, transparent);
+  }
+
+  /* ---------- soft confetti ---------- */
+  .confetti {
+    position: fixed;
+    top: -16px;
+    pointer-events: none;
+    z-index: 15;
+    border-radius: 2px;
+  }
+
+  /* ---------- bison boop ring ---------- */
+  .boop-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 140px;
+    height: 140px;
+    margin: -70px 0 0 -70px;
+    border: 2px solid var(--gold-light);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: 50% 50%;
+  }
+
+  /* ---------- a little note back ---------- */
+  .reply-card { margin-top: 34px; }
+  .reply-intro { font-size: 14px; line-height: 1.6; opacity: 0.8; margin: 0 0 16px; }
+  textarea#replyBox {
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--cream) 60%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+    border-radius: 12px;
+    padding: 12px;
+    resize: vertical;
+    min-height: 84px;
+    box-sizing: border-box;
+  }
+  .reply-card .soft-btn { margin-top: 12px; margin-right: 8px; }
+  .replies { margin-top: 18px; text-align: left; opacity: 0; min-height: 20px; }
+  .replies:not(:empty) { opacity: 1; }
+  .reply-item {
+    background: color-mix(in srgb, var(--gold) 10%, transparent);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    font-family: 'Amiri', serif;
+    font-size: 16px;
+    line-height: 1.6;
+    word-wrap: break-word;
+  }
+  .reply-item .when {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+  .reply-empty { font-size: 13px; opacity: 0.6; text-align: center; }
+
+  textarea#replyBox:focus-visible,
+  button.yes-btn:focus-visible,
+  button.no-btn:focus-visible,
+  button.soft-btn:focus-visible,
+  button.music-btn:focus-visible,
+  button.next-btn:focus-visible,
+  .mascot-wrap:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
@@ -414,6 +522,7 @@
         </g>
       </g>
     </svg>
+    <div class="boop-ring" id="boopRing"></div>
   </div>
   <p class="tap-hint">tap me ✨</p>
 </header>
@@ -423,19 +532,19 @@
 <main>
   <div class="card">
     <h2>reasons, in no particular order</h2>
-    <div id="flirt-line">Loading something sweet...</div>
-    <button class="next-btn" id="nextBtn">one more →</button>
+    <div id="flirt-line" aria-live="polite">Loading something sweet...</div>
+    <button class="next-btn" id="nextBtn" aria-label="next reason">one more →</button>
   </div>
 
   <div class="joke-toggle">
-    <a id="jokeToggle">okay but do you have a joke too?</a>
-    <div id="joke-line"></div>
+    <a id="jokeToggle" role="button" tabindex="0">okay but do you have a joke too?</a>
+    <div id="joke-line" aria-live="polite"></div>
   </div>
 
   <div class="card poem-card">
     <h2>one month with you ❤️</h2>
     <div class="poem-box" id="poemBox"></div>
-    <button class="soft-btn" id="poemBtn" style="margin-top:16px">again, slowly ↺</button>
+    <button class="soft-btn" id="poemBtn" style="margin-top:16px" aria-label="type the poem again">again, slowly ↺</button>
   </div>
 
   <div class="card together-card">
@@ -447,16 +556,20 @@
   <div class="card anniv-card" id="annivWrap">
     <h2>a whole month 🌙</h2>
     <div class="anniv-lock" id="annivLock">
-      <div class="lock-emoji">🔒</div>
-      <p>a little something is waiting here for you…<br>it unlocks tomorrow.</p>
-      <button class="soft-btn" id="peekBtn">I can't wait 🥹 open it now</button>
+      <div class="lock-emoji" id="lockEmoji">🔒</div>
+      <p>a little something is waiting here for you…<br>it unlocks on the 23rd 🌙</p>
+      <button class="soft-btn" id="peekBtn">can I peek? 👀</button>
+      <div class="anniv-tease" id="annivTease" role="status" aria-live="polite"></div>
     </div>
     <div class="anniv-content" id="annivOpen" hidden>
       <h2>one month of you 🥂</h2>
       <div class="anniv-msg">
-        One whole month, Shabnam — and it already feels like I've loved your laugh my whole life.
-        Thank you for every one of these days, for your smile, for you.
-        Here's to the next month, and then the one after that.
+        One whole month, Shabnam —<br>
+        and it already feels like I've loved your laugh my whole life.<br><br>
+        Thank you for every one of these days,<br>
+        for your smile, for you.<br><br>
+        Here's to the next month,<br>
+        and then the one after that.
         <span class="sign">happily yours, Josphat 🌙</span>
       </div>
     </div>
@@ -467,10 +580,22 @@
     <!-- ✏️ EDIT YOUR REQUEST HERE -->
     <div class="req-text">Can I borrow your hand for a slow dance, your attention for one silly idea, and your smile for the rest of the day?</div>
     <div class="req-yn">
-      <button class="yes-btn" id="yesBtn">yes 💚</button>
-      <button class="no-btn" id="noBtn">no</button>
+      <button class="yes-btn" id="yesBtn" aria-label="say yes">yes 💚</button>
+      <button class="no-btn" id="noBtn" aria-label="say no">no</button>
     </div>
-    <div class="req-answer" id="reqAnswer"></div>
+    <div class="req-answer" id="reqAnswer" aria-live="polite"></div>
+  </div>
+
+  <div class="card reply-card">
+    <h2>a little note back 💌</h2>
+    <p class="reply-intro">if you ever feel like it, leave me a note — it stays right here on your side, tucked safe with you.</p>
+    <label class="visually-hidden" for="replyBox">Write a note back to Josphat</label>
+    <textarea id="replyBox" rows="3" maxlength="500" placeholder="write to me here, Shabnam…"></textarea>
+    <div>
+      <button class="soft-btn" id="replySave">tuck it away 💌</button>
+      <button class="soft-btn" id="replyClear" style="display:none">start over</button>
+    </div>
+    <div id="replies" class="replies"></div>
   </div>
 </main>
 
@@ -482,12 +607,16 @@
   <iframe src="https://open.spotify.com/embed/track/4ud5CYIXZekCQSjFCuByXt" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 </div>
 <div class="music-float">
-  <button class="music-btn" id="musicBtn" aria-label="toggle music">🎵 our song</button>
+  <button class="music-btn" id="musicBtn" aria-label="toggle music" aria-expanded="false">🎵 our song</button>
 </div>
 
 <script>
 (function () {
   "use strict";
+
+  function reducedMotion() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
 
   var flirts = [
     "You walked in and every geometric pattern in the room suddenly felt a bit dull in comparison.",
@@ -582,6 +711,9 @@
       }
     }
   });
+  jokeToggle.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jokeToggle.click(); }
+  });
 
   showFlirt();
 
@@ -596,7 +728,7 @@
     star.style.transform = 'scale(' + (0.6 + Math.random() * 1.4).toFixed(2) + ')';
     starField.appendChild(star);
   }
-  if (window.anime) {
+  if (window.anime && !reducedMotion()) {
     anime({
       targets: '.star',
       opacity: [0.15, 0.9],
@@ -620,31 +752,42 @@
   }
 
   // ---- mascot idle bob + wing flap ----
-  if (window.anime) {
-    anime({
+  var bisonAnims = [];
+  if (window.anime && !reducedMotion()) {
+    bisonAnims.push(anime({
       targets: '#bisonBody',
       translateY: [-6, 0],
       duration: 2200,
       direction: 'alternate',
       loop: true,
       easing: 'easeInOutSine'
-    });
-    anime({
+    }));
+    bisonAnims.push(anime({
       targets: ['#wingL', '#wingR'],
       rotate: function (el) { return el.id === 'wingL' ? [0, -8] : [0, 8]; },
       duration: 900,
       direction: 'alternate',
       loop: true,
       easing: 'easeInOutSine'
-    });
-    anime({
+    }));
+    bisonAnims.push(anime({
       targets: '#tail',
       rotate: [0, 6],
       duration: 1400,
       direction: 'alternate',
       loop: true,
       easing: 'easeInOutSine'
-    });
+    }));
+    if ('IntersectionObserver' in window) {
+      var bisonObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          bisonAnims.forEach(function (a) {
+            if (en.isIntersecting) { a.play(); } else { a.pause(); }
+          });
+        });
+      });
+      bisonObs.observe(mascotWrap);
+    }
   }
 
   // ---- tap mascot: burst hearts + jump ----
@@ -680,6 +823,7 @@
   function tapMascot() {
     var rect = mascotWrap.getBoundingClientRect();
     burstHearts(rect.left + rect.width / 2, rect.top, 8);
+    boopRing();
     if (window.anime) {
       anime({
         targets: '#bisonBody',
@@ -689,6 +833,19 @@
       });
     }
     showFlirt();
+  }
+
+  function boopRing() {
+    if (reducedMotion() || !window.anime) return;
+    var ring = document.getElementById('boopRing');
+    anime({
+      targets: ring,
+      opacity: [0.8, 0],
+      scale: [0.6, 1.12],
+      duration: 650,
+      easing: 'easeOutQuad',
+      complete: function () { ring.style.opacity = 0; ring.style.transform = 'none'; }
+    });
   }
 
   mascotWrap.addEventListener('click', tapMascot);
@@ -720,15 +877,99 @@
     }
   }
 
-  var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!prefersReduced) {
-    setInterval(ambientHeart, 1400);
+  var ambientTimer = null;
+  function startAmbient() {
+    if (ambientTimer || reducedMotion() || document.hidden) return;
+    ambientTimer = setInterval(ambientHeart, 1400);
   }
+  function stopAmbient() {
+    if (ambientTimer) { clearInterval(ambientTimer); ambientTimer = null; }
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stopAmbient(); } else { startAmbient(); }
+  });
+  startAmbient();
 
   // ---------- one-month anniversary ----------
   var annivWrap = document.getElementById('annivWrap');
   var annivOpen = document.getElementById('annivOpen');
+  var lockEmoji = document.getElementById('lockEmoji');
   var peekBtn = document.getElementById('peekBtn');
+  var annivTease = document.getElementById('annivTease');
+  var annivDate = new Date(2026, 8, 23); // 9/23/2026, local midnight — ✏️ EDIT IF IT DIFFERS
+
+  var teaseLines = [
+    'Not yet, Shabnam 🥹',
+    'Nice try 😭 come back tomorrow.',
+    'The surprise is still sleeping 🌙',
+    'Patience, my love 💛 almost there.',
+    "I promise it's worth the wait 💌"
+  ];
+  var teaseIdx = 0;
+
+  function isUnlockDay() {
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return today >= annivDate;
+  }
+
+  function gentlyFall(x, y) {
+    if (reducedMotion()) return;
+    var colors = ['#c9a24b', '#e6cd8b', '#fbf6ea', '#1a8f68', '#d97f74'];
+    for (var i = 0; i < 34; i++) {
+      var c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = (x + (Math.random() * 240 - 120)) + 'px';
+      c.style.top = (y - 30 + Math.random() * 20) + 'px';
+      c.style.width = (6 + Math.random() * 5) + 'px';
+      c.style.height = (8 + Math.random() * 6) + 'px';
+      c.style.backgroundColor = colors[i % colors.length];
+      c.style.opacity = 0.9;
+      document.body.appendChild(c);
+      (function (el) {
+        if (window.anime) {
+          anime({
+            targets: el,
+            translateY: (220 + Math.random() * 240),
+            translateX: (Math.random() * 100 - 50),
+            rotate: (Math.random() * 540 - 270),
+            opacity: [0.9, 0],
+            duration: 1800 + Math.random() * 1400,
+            easing: 'easeOutQuad',
+            complete: function () { el.remove(); }
+          });
+        } else {
+          setTimeout(function () { el.remove(); }, 3000);
+        }
+      })(c);
+    }
+  }
+
+  function gentleStars(container) {
+    if (reducedMotion()) return;
+    for (var i = 0; i < 10; i++) {
+      var s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.top = (15 + Math.random() * 75) + '%';
+      s.style.transform = 'scale(' + (0.5 + Math.random() * 0.9).toFixed(2) + ')';
+      container.appendChild(s);
+      (function (el) {
+        if (window.anime) {
+          anime({
+            targets: el,
+            translateY: [8, -26],
+            opacity: [0.9, 0.15],
+            duration: 2000 + Math.random() * 1500,
+            direction: 'alternate',
+            loop: 2,
+            easing: 'easeInOutSine',
+            complete: function () { el.remove(); }
+          });
+        }
+      })(s);
+    }
+  }
 
   function openAnniv() {
     if (annivWrap.classList.contains('anniv-open')) return;
@@ -736,57 +977,54 @@
     annivWrap.classList.add('anniv-open');
     annivOpen.hidden = false;
     var r = annivWrap.getBoundingClientRect();
-    if (window.anime) {
+    if (window.anime && !reducedMotion()) {
       anime({
         targets: annivOpen,
         opacity: [0, 1],
         translateY: [18, 0],
-        scale: [0.95, 1],
-        duration: 650,
-        easing: 'easeOutQuart'
+        scale: [0.96, 1],
+        duration: 700,
+        easing: 'easeOutQuart',
+        begin: function () { annivOpen.classList.add('revealed'); }
       });
     } else {
       annivOpen.style.opacity = 1;
+      annivOpen.classList.add('revealed');
     }
-    var sparks = ['💚', '🤍', '💛', '🎉', '🥂', '✨', '💖'];
-    for (var sp = 0; sp < 20; sp++) {
-      var spark = document.createElement('div');
-      spark.className = 'heart';
-      spark.textContent = sparks[sp % sparks.length];
-      spark.style.left = (r.left + Math.random() * r.width) + 'px';
-      spark.style.top = r.top + 'px';
-      spark.style.fontSize = (12 + Math.random() * 14) + 'px';
-      document.body.appendChild(spark);
-      (function (el) {
-        if (window.anime) {
-          anime({
-            targets: el,
-            translateY: -(140 + Math.random() * 240),
-            translateX: (Math.random() * 180 - 90),
-            rotate: (Math.random() * 80 - 40),
-            opacity: [1, 0],
-            duration: 1500 + Math.random() * 1000,
-            easing: 'easeOutQuad',
-            complete: function () { el.remove(); }
-          });
-        } else {
-          setTimeout(function () { el.remove(); }, 2200);
-        }
-      })(spark);
+    gentleStars(annivOpen);
+    var seen = false;
+    try { seen = !!localStorage.getItem('livid_anniv_seen'); } catch (e) {}
+    if (!seen) {
+      try { localStorage.setItem('livid_anniv_seen', '1'); } catch (e) {}
+      gentlyFall(r.left + r.width / 2, r.top + r.height / 2);
+      burstHearts(r.left + r.width / 2, r.top + r.height / 2, 5);
     }
-    burstHearts(r.left + r.width / 2, r.top + r.height / 2, 8);
   }
 
-  var annivDate = new Date(2026, 8, 23); // 9/23/2026, local midnight
-  (function autoUnlock() {
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    if (today >= annivDate) {
-      peekBtn.textContent = 'open it 💌';
-      openAnniv();
+  function peekEarly() {
+    if (isUnlockDay()) { openAnniv(); return; }
+    lockEmoji.classList.remove('lock-shake');
+    void lockEmoji.offsetWidth;
+    lockEmoji.classList.add('lock-shake');
+    teaseIdx = (teaseIdx + 1) % teaseLines.length;
+    annivTease.textContent = teaseLines[teaseIdx];
+    if (window.anime) {
+      anime({ targets: annivTease, opacity: [0, 1], translateY: [6, 0], duration: 300, easing: 'easeOutQuad' });
+      anime({ targets: peekBtn, scale: [1, 0.94, 1], duration: 340, easing: 'easeOutQuad' });
+    } else {
+      annivTease.classList.add('show');
     }
-  })();
-  peekBtn.addEventListener('click', openAnniv);
+  }
+
+  function syncUnlockState() {
+    var unlocked = isUnlockDay();
+    peekBtn.textContent = unlocked ? 'open your surprise ✨' : 'can I peek? 👀';
+    if (unlocked) openAnniv();
+  }
+  syncUnlockState();
+  setInterval(syncUnlockState, 30000);
+  document.addEventListener('visibilitychange', syncUnlockState);
+  peekBtn.addEventListener('click', peekEarly);
 
   // ---------- one small request ----------
   var yesBtn = document.getElementById('yesBtn');
@@ -794,38 +1032,85 @@
   var reqAnswer = document.getElementById('reqAnswer');
   var reqCard = document.getElementById('reqCard');
   var noHits = 0;
+  var noAllowedAt = 3; // she can dodge this many times, then saying no is allowed
+  var state = 'asking'; // 'asking' | 'no' | 'yes'
 
-  function dodgeNo() {
-    noHits++;
-    var x = (Math.random() * 44 - 22) * (0.5 + noHits * 0.35);
-    var y = (Math.random() * 44 - 22) * (0.5 + noHits * 0.35);
-    var scale = Math.max(0.45, 1 - 0.09 * noHits);
+  var dodgeLines = [
+    'wait— 🫣',
+    'nope, not letting you 🤭',
+    'try that again 😌'
+  ];
+
+  function reqSay(msg) {
+    reqAnswer.textContent = msg;
     if (window.anime) {
-      anime({ targets: noBtn, translateX: [0, x], translateY: [0, y], scale: scale, duration: 320, easing: 'easeOutQuad' });
-      anime({ targets: yesBtn, scale: 1 + 0.06 * noHits, duration: 320, easing: 'easeOutQuad' });
+      anime({ targets: reqAnswer, opacity: [0, 1], translateY: [8, 0], duration: 400, easing: 'easeOutQuad' });
     } else {
-      noBtn.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')';
-      yesBtn.style.transform = 'scale(' + (1 + 0.06 * noHits) + ')';
+      reqAnswer.style.opacity = 1;
     }
   }
 
-  noBtn.addEventListener('click', dodgeNo);
-  noBtn.addEventListener('mouseenter', dodgeNo);
-  yesBtn.addEventListener('click', function () {
-    reqAnswer.textContent = "Yay 🥹 that's all I ever wanted, Shabnam. I'm yours.";
-    if (window.anime) {
-      anime({ targets: reqAnswer, opacity: [0, 1], translateY: [8, 0], duration: 400, easing: 'easeOutQuad' });
-      anime({ targets: yesBtn, scale: 1.25, duration: 400, easing: 'easeOutBack' });
-      anime({ targets: noBtn, opacity: [1, 0], duration: 250, easing: 'easeInQuad' });
-    } else {
-      reqAnswer.style.opacity = 1;
-      noBtn.style.opacity = 0;
-    }
+  function answerYes() {
+    if (state === 'yes') return;
+    var changedMind = state === 'no';
+    state = 'yes';
+    noBtn.disabled = true;
     noBtn.style.pointerEvents = 'none';
+    noBtn.textContent = 'no was just for show 😌';
+    yesBtn.disabled = true;
     yesBtn.textContent = 'she said yes 💚';
+    reqSay(changedMind
+      ? 'Changed your mind? 🥹 best verdict yet. I\'m yours.'
+      : 'Yay 🥹 that\'s all I ever wanted, Shabnam. I\'m yours.');
+    if (window.anime) {
+      anime({ targets: yesBtn, scale: 1.18, duration: 450, easing: 'easeOutBack' });
+      anime({ targets: noBtn, opacity: [1, 0.55], duration: 350, easing: 'easeInQuad' });
+    } else {
+      noBtn.style.opacity = 0.55;
+    }
     var rc = reqCard.getBoundingClientRect();
     burstHearts(rc.left + rc.width / 2, rc.top + rc.height / 2, 12);
+  }
+
+  function answerNo() {
+    if (state !== 'asking') return;
+    state = 'no';
+    noBtn.disabled = true;
+    noBtn.textContent = 'noted, no 🥹';
+    reqSay('Okay okay 😭 I respect the verdict. But I\'ll still be over here smiling at you.');
+    if (window.anime) {
+      anime({ targets: yesBtn, scale: 1, duration: 300, easing: 'easeOutQuad' });
+      anime({ targets: noBtn, opacity: [1, 0.6], duration: 300, easing: 'easeInQuad' });
+    } else {
+      noBtn.style.opacity = 0.6;
+    }
+  }
+
+  function dodgeNo() {
+    if (state !== 'asking') return;
+    noHits++;
+    if (noHits < noAllowedAt) {
+      var x = (Math.random() * 44 - 22) * (0.5 + noHits * 0.3);
+      var y = (Math.random() * 44 - 22) * (0.5 + noHits * 0.3);
+      var scale = Math.max(0.8, 1 - 0.06 * noHits);
+      reqSay(dodgeLines[Math.min(noHits - 1, dodgeLines.length - 1)]);
+      if (window.anime) {
+        anime({ targets: noBtn, translateX: [0, x], translateY: [0, y], scale: scale, duration: 300, easing: 'easeOutQuad' });
+        anime({ targets: yesBtn, scale: 1 + 0.05 * noHits, duration: 300, easing: 'easeOutQuad' });
+      } else {
+        noBtn.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')';
+      }
+      return;
+    }
+    noBtn.style.transform = 'none';
+    answerNo();
+  }
+
+  noBtn.addEventListener('click', dodgeNo);
+  noBtn.addEventListener('mouseenter', function () {
+    if (state === 'asking' && noHits < noAllowedAt) dodgeNo();
   });
+  yesBtn.addEventListener('click', answerYes);
 
   // ---------- time-of-day greeting ----------
   var greetingEl = document.getElementById('greeting');
@@ -844,52 +1129,46 @@
 
   // ---------- poem, typed slowly ----------
   var poemLines = [
-    "One month may seem like a little time,",
-    "Yet somehow, with you, it feels so divine.",
-    "A month of laughter, affection, and you,",
-    "A beautiful chapter that feels fresh and new.",
+    "One month, Shabnam — a little time, it's true,",
+    "and yet with you it bloomed into something new.",
+    "A month of laughter, of softness, and of you,",
+    "a chapter I'd fold up and keep like a prayer.",
     "",
-    "Today, as we celebrate our very first month,",
-    "I want to appreciate you for all that you've done.",
-    "For your beauty that catches my eyes every day,",
-    "And your loving, sweet, adorable way.",
+    "For your brown eyes — the softest shade I know —",
+    "the kind I could get lost in as the hours go.",
+    "For that sleepy voice when sleep is in your eyes,",
+    "the gentlest good morning under any skies.",
     "",
-    "I love those beautiful brown eyes of yours,",
-    "The kind I could get lost in for hours and hours.",
-    "And that sweet voice I could listen to all night,",
-    "Especially when you wake up, sleepy and light.",
+    "For your hands that I love to hold in mine,",
+    "and that shy little blush when you turn to hide —",
+    "you hide your beautiful face, and yet, somehow,",
+    "I fall a little deeper, every time.",
     "",
-    "I love your soft hands and the way that you blush,",
-    "When you hide your beautiful face in that shy little rush.",
-    "And those sweet lips that I love when we kiss,",
-    "Moments with you that I never want to miss.",
+    "For your lips, soft as a whispered prayer,",
+    "and the way you carry yourself — slowly, proudly —",
+    "every part of you feels beautifully, blessedly yours,",
+    "from your laugh to the little ways you love.",
     "",
-    "And yes, I have to mention that beautiful body too,",
-    "Because somehow, everything about you is just you.",
-    "Beautiful from your smile to the things I can't explain,",
-    "A woman I'm grateful to have in my life again and again.",
+    "This first month has been a dream in every way,",
+    "and I pray there are many more ahead of us to stay —",
+    "more months, more mornings, more laughter and years,",
+    "more 'us', through smiles and even through tears.",
     "",
-    "This first month has been beautiful in every way,",
-    "And I hope there are many more ahead of us to stay.",
-    "More months, more memories, more laughter and years,",
-    "More moments together through smiles and through tears.",
+    "If God allows, this is only where we start,",
+    "a slow and lovely story, written heart to heart.",
+    "Because one thing this whole month has made true:",
+    "life is a little more beautiful since I found you.",
     "",
-    "If God allows us, I hope this is only the start,",
-    "Of a beautiful journey written heart to heart.",
-    "Because after this first month, one thing feels true—",
-    "Life has been a little more beautiful because of you.",
-    "",
-    "Happy one-month anniversary, Shabnam. ❤️",
-    "",
-    "Here's to our first month,",
-    "and hopefully to many more months and years together.",
-    "I appreciate you, I cherish you, and I'm grateful for you."
+    "Happy one-month anniversary, my love 🌙",
+    "— Josphat"
   ];
   var poem = poemLines.join('\n');
   var poemBox = document.getElementById('poemBox');
   var poemBtn = document.getElementById('poemBtn');
   var poemTimer = null;
+
   function typePoem() {
+    if (reducedMotion()) { poemBox.textContent = poem; return; }
     if (poemTimer) { clearInterval(poemTimer); poemTimer = null; }
     poemBox.textContent = '';
     var i = 0;
@@ -901,9 +1180,25 @@
         clearInterval(poemTimer);
         poemTimer = null;
       }
-    }, 14);
+    }, 16);
   }
-  typePoem();
+
+  function startPoemWhenNear() {
+    if (window.anime && 'IntersectionObserver' in window && !reducedMotion()) {
+      var poemObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && poemTimer === null && !poemBox.textContent) {
+            poemObs.disconnect();
+            typePoem();
+          }
+        });
+      }, { rootMargin: '300px 0px' });
+      poemObs.observe(poemBox);
+    } else {
+      typePoem();
+    }
+  }
+  startPoemWhenNear();
   poemBtn.addEventListener('click', typePoem);
 
   // ---------- together counter ----------
@@ -930,7 +1225,75 @@
   musicBtn.addEventListener('click', function () {
     var open = musicPanel.classList.toggle('open');
     musicBtn.textContent = open ? '🎵 listening' : '🎵 our song';
+    musicBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
+
+  // ---------- a little note back ----------
+  var replyBox = document.getElementById('replyBox');
+  var replySave = document.getElementById('replySave');
+  var replyClear = document.getElementById('replyClear');
+  var repliesEl = document.getElementById('replies');
+  var repliesKey = 'livid_replies';
+
+  function loadReplies() {
+    try {
+      var raw = localStorage.getItem(repliesKey);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+  function saveReplies(list) {
+    try { localStorage.setItem(repliesKey, JSON.stringify(list)); } catch (e) {}
+  }
+  function renderReplies() {
+    var list = loadReplies();
+    repliesEl.innerHTML = '';
+    repliesEl.style.opacity = 1;
+    if (!list.length) {
+      var empty = document.createElement('p');
+      empty.className = 'reply-empty';
+      empty.textContent = 'nothing tucked away just yet 🌙';
+      repliesEl.appendChild(empty);
+      replyClear.style.display = 'none';
+      return;
+    }
+    replyClear.style.display = '';
+    list.slice().reverse().forEach(function (note) {
+      var item = document.createElement('div');
+      item.className = 'reply-item';
+      var when = document.createElement('span');
+      when.className = 'when';
+      when.textContent = note.when;
+      when.setAttribute('aria-hidden', 'true');
+      var body = document.createElement('div');
+      body.textContent = note.text;
+      item.appendChild(when);
+      item.appendChild(body);
+      repliesEl.appendChild(item);
+    });
+  }
+
+  replySave.addEventListener('click', function () {
+    var text = replyBox.value.trim();
+    if (!text) { replyBox.focus(); return; }
+    var list = loadReplies();
+    var now = new Date();
+    var stamp = now.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    list.push({ when: stamp, text: text });
+    saveReplies(list);
+    replyBox.value = '';
+    renderReplies();
+    if (window.anime && !reducedMotion()) {
+      anime({ targets: repliesEl, opacity: [0, 1], translateY: [8, 0], duration: 400, easing: 'easeOutQuad' });
+    }
+  });
+
+  replyClear.addEventListener('click', function () {
+    saveReplies([]);
+    renderReplies();
+    replyBox.focus();
+  });
+
+  renderReplies();
 
 })();
 </script>
